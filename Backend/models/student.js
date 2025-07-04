@@ -101,17 +101,17 @@ const student = new mongoose.Schema({
   },
 });
 
-const achievement = new mongoose.Schema({
-  student: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Student", // Reference the 'Student' model
-    required: true,
-  },
-  under: { type: String },
-  designation: { type: String, required: false },
-  eventName: { type: String, required: false },
-  conductedBy: { type: String, required: false },
-});
+// const achievement = new mongoose.Schema({
+//   student: {
+//     type: mongoose.Schema.Types.ObjectId,
+//     ref: "Student", // Reference the 'Student' model
+//     required: true,
+//   },
+//   under: { type: String },
+//   designation: { type: String, required: false },
+//   eventName: { type: String, required: false },
+//   conductedBy: { type: String, required: false },
+// });
 
 const createPORSchema = (type) => {
   return new mongoose.Schema({
@@ -141,13 +141,13 @@ const ScietechPOR = mongoose.model("ScietechPOR", scitech_por);
 const CultPOR = mongoose.model("CultPOR", cult_por);
 const SportsPOR = mongoose.model("SportSPOR", sport_por);
 const AcadPOR = mongoose.model("AcadPOR", acad_por);
-const Achievement = mongoose.model("Achievement", achievement);
+//const Achievement = mongoose.model("Achievement", achievement);
 module.exports = {
   Student,
   ScietechPOR,
   CultPOR,
   SportsPOR,
   AcadPOR,
-  Achievement,
+  //Achievement,
   User,
 };

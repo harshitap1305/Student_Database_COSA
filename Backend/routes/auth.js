@@ -11,9 +11,11 @@ const {
   CultPOR,
   SportsPOR,
   AcadPOR,
-  User,
+  //User,
   Achievement,
 } = require("../models/student");
+const User = require("../models/database");
+const getRole = require("../Middlewares/getRole");
 const passport = require("../models/passportConfig");
 const rateLimit = require("express-rate-limit");
 var nodemailer = require("nodemailer");
@@ -55,7 +57,7 @@ router.get("/fetchAuth", function (req, res) {
 // Local Authentication
 router.post("/login", passport.authenticate("local"), (req, res) => {
   // If authentication is successful, this function will be called
-  const email = req.user.username;
+  const email = req.user.username; // Assuming username is the email
   if (!isIITBhilaiEmail(email)) {
     console.log("Access denied. Please use your IIT Bhilai email.");
     return res.status(403).json({
@@ -79,7 +81,16 @@ router.post("/register", async (req, res) => {
     }
 
     const newUser = await User.register(
-      new User({ name: name, strategy: "local", ID_No: ID, username: email }),
+      new User({
+        user_id: ID,
+        username: email,
+        role: getRole(email),
+        strategy: "local",
+        personal_info: {
+          name: name,
+          email: email,
+        },
+      }),
       password,
     );
 
@@ -112,6 +123,7 @@ router.get(
   },
 );
 
+//this router is not used now - as we have onboarding logic : so not changing
 router.get("/google/addId", (req, res) => {
   if (!req.user) {
     return res.status(401).json({ message: "Unauthorized" });
@@ -120,7 +132,7 @@ router.get("/google/addId", (req, res) => {
   const token = jwt.sign({ id: req.user._id }, secretKey, { expiresIn: "1h" });
   res.redirect(`${process.env.FRONTEND_URL}/register/google/${token}`);
 });
-
+//this router is not used now - as we have onboarding logic : so not changing
 router.post("/google/register", async (req, res) => {
   try {
     const { token, ID_No } = req.body;
@@ -186,12 +198,10 @@ router.post("/forgot-password", forgotPasswordLimiter, async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
     if (user.strategy === "google") {
-      return res
-        .status(400)
-        .json({
-          message:
-            "This email is linked with Google Login. Please use 'Sign in with Google' instead.",
-        });
+      return res.status(400).json({
+        message:
+          "This email is linked with Google Login. Please use 'Sign in with Google' instead.",
+      });
     }
     const secret = user._id + process.env.JWT_SECRET_TOKEN;
     const token = jwt.sign({ email: email, id: user._id }, secret, {
